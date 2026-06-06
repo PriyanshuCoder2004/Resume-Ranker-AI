@@ -1,0 +1,14 @@
+Job Title: Software Engineer
+
+Responsibilities:
+- Design, develop, and maintain robust web applications.
+- Collaborate with cross-functional teams to define, design, and ship new features.
+- Write clean, maintainable, and efficient code.
+- Troubleshoot, debug, and upgrade existing systems.
+
+Requirements:
+- Bachelor's degree in Computer Science, Engineering, or a related field.
+- 2+ years of professional software development experience.
+- Strong proficiency in Python, JavaScript, and web frameworks.
+- Experience with  Git.
+- Solid understanding of software development lifecycle (SDLC) and RESTful APIs.

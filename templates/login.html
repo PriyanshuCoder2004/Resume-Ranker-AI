@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In — ResumeAI</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        appBg: '#0D1117',
+                        appCard: '#161B22',
+                        appAccent: '#F78166',
+                        appBorder: '#21262d',
+                        appMuted: '#8b949e',
+                        brandPurple: '#a855f7'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-appBg text-white font-sans min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+
+    <!-- Backdrops -->
+    <div class="absolute top-[20%] left-[20%] w-[300px] h-[300px] rounded-full bg-appAccent/5 blur-[80px] pointer-events-none"></div>
+    <div class="absolute bottom-[20%] right-[20%] w-[350px] h-[350px] rounded-full bg-brandPurple/5 blur-[100px] pointer-events-none"></div>
+
+    <div class="w-full max-w-md bg-[#161B22] border border-appBorder rounded-2xl p-8 shadow-2xl relative z-10 flex flex-col gap-6">
+        <!-- Logo Header -->
+        <div class="flex flex-col items-center gap-2 text-center">
+            <a href="/" class="flex items-center gap-3 group">
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-appAccent to-brandPurple flex items-center justify-center text-white font-extrabold text-xl shadow-lg transition-transform group-hover:scale-105">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <span class="text-md font-bold tracking-tight text-white text-left">Resume<span class="text-appAccent">AI</span></span>
+            </a>
+            <h2 class="text-lg font-bold text-white mt-4">Welcome Back</h2>
+            <p class="text-xs text-appMuted">Enter credentials to launch your screening workspace</p>
+        </div>
+
+        <!-- Alert messages -->
+        {% if error %}
+        <div class="bg-red-500/10 border border-red-500/30 text-red-400 text-xs px-4 py-3 rounded-xl flex items-center gap-2.5">
+            <i class="fa-solid fa-circle-exclamation text-sm shrink-0"></i>
+            <span>{{ error }}</span>
+        </div>
+        {% endif %}
+
+        <!-- Form -->
+        <form action="/login" method="POST" class="flex flex-col gap-5">
+            <div class="flex flex-col gap-1.5">
+                <label for="username" class="text-xs font-bold uppercase tracking-wider text-appMuted">Username or Email</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-appMuted text-xs"><i class="fa-solid fa-user"></i></span>
+                    <input type="text" id="username" name="username" placeholder="Username or Email" required 
+                        class="w-full bg-appBg border border-appBorder rounded-xl pl-10 pr-4 py-3 text-xs text-white placeholder-appMuted/50 focus:outline-none focus:border-appAccent transition-colors">
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label for="password" class="text-xs font-bold uppercase tracking-wider text-appMuted">Password</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-appMuted text-xs"><i class="fa-solid fa-lock"></i></span>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required 
+                        class="w-full bg-appBg border border-appBorder rounded-xl pl-10 pr-4 py-3 text-xs text-white placeholder-appMuted/50 focus:outline-none focus:border-appAccent transition-colors">
+                </div>
+            </div>
+
+            <button type="submit" 
+                class="w-full bg-appAccent hover:bg-[#e06c53] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-appAccent/10 text-xs flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                Sign In <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            </button>
+        </form>
+
+        <div class="text-center text-xs text-appMuted border-t border-appBorder/50 pt-5 mt-1">
+            Don't have an account? 
+            <a href="/signup" class="text-appAccent hover:underline font-semibold ml-1">Create one here</a>
+        </div>
+    </div>
+
+</body>
+</html>

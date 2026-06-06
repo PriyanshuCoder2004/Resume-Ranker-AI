@@ -1,0 +1,1997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeAI — Enterprise SaaS Dashboard</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        appBg: '#0D1117',
+                        appCard: '#161B22',
+                        appAccent: '#a855f7', // Purple/Magenta
+                        appAccentBlue: '#38bdf8', // Cyan
+                        appAccentYellow: '#eab308', // Yellow
+                        appBorder: '#21262d',
+                        appMuted: '#8b949e'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom neon glows and glassmorphism from Image 2 */
+        .glass-sidebar {
+            background: #0D1117;
+            border-right: 1px solid #21262d;
+        }
+        
+        .glow-card-magenta {
+            border: 1.5px solid #a855f7;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.15);
+        }
+        .glow-card-cyan {
+            border: 1.5px solid #38bdf8;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+        }
+        .glow-card-yellow {
+            border: 1.5px solid #eab308;
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.15);
+        }
+
+        .matched-glow {
+            border: 1px solid #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+        .missing-glow {
+            border: 1px solid #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.2);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0D1117;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #30363D;
+            border-radius: 4px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-appBg text-white font-sans min-h-screen flex custom-scrollbar overflow-x-hidden">
+
+    <!-- ==========================================================================
+       SIDEBAR SYSTEM (ACTIVE VIEW MANAGEMENT)
+       ========================================================================== -->
+    <aside class="w-64 glass-sidebar shrink-0 min-h-screen p-6 flex flex-col justify-between hidden md:flex">
+        <div class="flex flex-col gap-8">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3">
+                <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white font-extrabold text-lg shadow-lg">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                    <span class="text-md font-bold tracking-tight">Resume<span class="text-purple-500">AI</span></span>
+                    <span class="block text-[9px] text-appMuted uppercase tracking-widest font-semibold">Screening Engine</span>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="flex flex-col gap-1.5" id="sidebarNav">
+                <button data-view="dashboard" class="nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-xl bg-purple-600/10 text-purple-400 border border-purple-500/20 text-sm font-semibold transition-all">
+                    <i class="fa-solid fa-table-columns text-md w-5 text-center"></i> Dashboard
+                </button>
+                <button data-view="candidates" class="nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-appMuted hover:text-white hover:bg-appCard/50 text-sm font-medium transition-all text-left">
+                    <i class="fa-solid fa-users text-md w-5 text-center"></i> Candidates
+                </button>
+                <button data-view="analytics" class="nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-appMuted hover:text-white hover:bg-appCard/50 text-sm font-medium transition-all text-left">
+                    <i class="fa-solid fa-chart-pie text-md w-5 text-center"></i> Analytics
+                </button>
+                <button data-view="jobs" class="nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-appMuted hover:text-white hover:bg-appCard/50 text-sm font-medium transition-all text-left">
+                    <i class="fa-solid fa-briefcase text-md w-5 text-center"></i> Jobs
+                </button>
+                <button data-view="settings" class="nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-appMuted hover:text-white hover:bg-appCard/50 text-sm font-medium transition-all text-left">
+                    <i class="fa-solid fa-sliders text-md w-5 text-center"></i> Settings
+                </button>
+            </nav>
+        </div>
+
+        <!-- User Profile & Sign Out -->
+        <div class="border-t border-appBorder pt-4 flex flex-col gap-3">
+            <div class="flex items-center gap-3 bg-[#161B22]/50 p-2.5 rounded-xl border border-appBorder/40">
+                <div class="h-8 w-8 rounded-full bg-gradient-to-tr from-appAccent to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    {{ session.username[:2].upper() if session.username else 'US' }}
+                </div>
+                <div class="flex flex-col min-w-0">
+                    <span class="text-xs font-bold text-white truncate">{{ session.username }}</span>
+                    <span class="text-[9px] text-appMuted">Authorized User</span>
+                </div>
+            </div>
+            <a href="/logout" class="w-full flex items-center gap-3.5 px-4 py-2.5 rounded-xl text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs font-semibold transition-all">
+                <i class="fa-solid fa-arrow-right-from-bracket text-center w-5"></i> Sign Out
+            </a>
+            
+            <!-- System Version -->
+            <div class="flex flex-col gap-1 text-[10px] text-appMuted mt-1">
+                <div class="flex items-center gap-2">
+                    <span class="inline-block h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse"></span>
+                    <span>v2.0 Semantic SaaS</span>
+                </div>
+                <span>© 2026 ResumeAI Inc.</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN DASHBOARD CONTENT AREA -->
+    <div class="flex-1 flex flex-col min-w-0">
+        <!-- HEADER -->
+        <header class="border-b border-appBorder px-8 py-5 flex items-center justify-between bg-appCard/30 backdrop-blur-md sticky top-0 z-40">
+            <div>
+                <h1 class="text-lg font-bold flex items-center gap-2 text-white">
+                    Dashboard <i class="fa-solid fa-angle-right text-xs text-appMuted"></i> <span id="currentViewTitle" class="text-purple-400 font-semibold">Ranking System</span>
+                </h1>
+                <p id="currentDate" class="text-xs text-appMuted mt-0.5">Oct 26, 2023</p>
+            </div>
+            
+            <!-- CTA: New Screening Trigger -->
+            <button id="openScreeningModal" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-5 rounded-xl shadow-lg shadow-purple-600/20 text-xs flex items-center gap-2 transition-all active:scale-[0.98]">
+                <i class="fa-solid fa-plus"></i> New Candidate Screen
+            </button>
+        </header>
+
+        <!-- VIEW PANELS -->
+        <div class="flex-1 p-8 max-w-[1400px] w-full mx-auto">
+
+            <!-- ==========================================================================
+               1. DASHBOARD VIEW (MAIN VIEW)
+               ========================================================================== -->
+            <div id="view-dashboard" class="view-panel flex flex-col gap-8 animate-fade-in">
+                <!-- 3 Top Stats Cards -->
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-appCard border border-appBorder rounded-2xl p-6 flex items-center justify-between hover:border-purple-500/25 transition-all">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] font-bold text-appMuted uppercase tracking-wider">TOTAL SCREENED</span>
+                            <span id="statTotal" class="text-3xl font-extrabold text-white">0</span>
+                            <span class="text-[10px] text-green-400 font-semibold flex items-center gap-1 mt-1">
+                                <i class="fa-solid fa-circle-arrow-up"></i> +5% growth
+                            </span>
+                        </div>
+                        <div class="h-12 w-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 border border-purple-500/20">
+                            <i class="fa-solid fa-users text-lg"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-appCard border border-appBorder rounded-2xl p-6 flex items-center justify-between hover:border-sky-500/25 transition-all">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] font-bold text-appMuted uppercase tracking-wider">TOP FIT MATCH</span>
+                            <span id="statTopScore" class="text-3xl font-extrabold text-white">0%</span>
+                            <span id="statTopSubtext" class="text-[10px] text-appMuted font-semibold mt-1">0 candidates over 70%</span>
+                        </div>
+                        <div class="h-12 w-12 rounded-xl bg-sky-500/10 flex items-center justify-center text-sky-400 border border-sky-500/20">
+                            <i class="fa-solid fa-user-check text-lg"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-appCard border border-appBorder rounded-2xl p-6 flex items-center justify-between hover:border-yellow-500/25 transition-all">
+                        <div class="flex flex-col gap-1">
+                            <span class="text-[10px] font-bold text-appMuted uppercase tracking-wider">RESUMES IN REVIEW</span>
+                            <span id="statInReview" class="text-3xl font-extrabold text-white">0</span>
+                            <span class="text-[10px] text-appMuted font-semibold mt-1">Active analysis queue</span>
+                        </div>
+                        <div class="h-12 w-12 rounded-xl bg-yellow-500/10 flex items-center justify-center text-yellow-400 border border-yellow-500/20">
+                            <i class="fa-solid fa-file-invoice text-lg"></i>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Main Rankings Grid -->
+                <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                    <div class="lg:col-span-2 bg-[#161B22] border border-appBorder rounded-2xl p-6 shadow-xl flex flex-col gap-6">
+                        <div class="flex items-center justify-between border-b border-appBorder pb-4">
+                            <h2 class="text-md font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-list-ol text-purple-400"></i> Candidate Rankings
+                            </h2>
+                        </div>
+
+                        <!-- Empty Table State -->
+                        <div id="emptyTableState" class="flex flex-col items-center justify-center text-center py-24 gap-4">
+                            <div class="h-16 w-16 rounded-2xl bg-appBg/50 border border-appBorder flex items-center justify-center text-appMuted/40 text-2xl">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white">No screening run yet</h3>
+                                <p class="text-xs text-appMuted max-w-sm mt-1">Click the "+ New Candidate Screen" button in the header to run matches.</p>
+                            </div>
+                        </div>
+
+                        <!-- Table Container -->
+                        <div id="tableContainer" class="w-full overflow-x-auto hidden">
+                            <table class="w-full text-left border-collapse text-sm">
+                                <thead>
+                                    <tr class="text-appMuted uppercase text-[10px] tracking-wider border-b border-appBorder">
+                                        <th class="pb-3 font-semibold">Rank</th>
+                                        <th class="pb-3 font-semibold">Candidate Name</th>
+                                        <th class="pb-3 font-semibold">Similarity Score</th>
+                                        <th class="pb-3 font-semibold">Skill Match %</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rankingsTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Floating Candidate Analysis Panel -->
+                    <div id="analysisPanel" class="bg-[#161B22] border border-appBorder rounded-2xl p-6 shadow-xl flex flex-col gap-6 hidden">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[9px] uppercase tracking-wider text-appMuted font-bold">Candidate Analysis</span>
+                                <h2 id="panelName" class="text-lg font-bold text-white mt-0.5 truncate max-w-[200px]">Candidate Name</h2>
+                            </div>
+                            <span id="panelRankBadge" class="bg-purple-600/20 text-purple-400 border border-purple-500/30 text-[10px] font-bold px-2 py-0.5 rounded">Rank 1</span>
+                        </div>
+
+                        <!-- Tab Navigation -->
+                        <div class="flex border-b border-appBorder">
+                            <button id="tabBtnSkill" class="flex-1 pb-3 text-xs font-bold uppercase tracking-wider text-purple-400 border-b-2 border-purple-500 focus:outline-none transition-all">
+                                <i class="fa-solid fa-chart-simple mr-1.5"></i> Skill Match
+                            </button>
+                            <button id="tabBtnPdf" class="flex-1 pb-3 text-xs font-bold uppercase tracking-wider text-appMuted hover:text-white border-b-2 border-transparent focus:outline-none transition-all">
+                                <i class="fa-solid fa-file-pdf mr-1.5"></i> Resume PDF
+                            </button>
+                            <button id="tabBtnChat" class="flex-1 pb-3 text-xs font-bold uppercase tracking-wider text-appMuted hover:text-white border-b-2 border-transparent focus:outline-none transition-all">
+                                <i class="fa-solid fa-comments mr-1.5"></i> Recruiter Chat
+                            </button>
+                        </div>
+
+                        <!-- Tab Content: Skill Match (Default View) -->
+                        <div id="panelContentSkill" class="flex flex-col gap-6">
+                            <div class="flex items-center gap-3.5 border-b border-appBorder pb-5">
+                                <div class="h-12 w-12 rounded-full bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white text-xl font-bold shrink-0 shadow-lg shadow-purple-600/10">
+                                    <i class="fa-solid fa-user-tie"></i>
+                                </div>
+                                <div>
+                                    <h3 id="panelSubtitle" class="text-sm font-bold text-white truncate max-w-[180px]">Senior Software Engineer</h3>
+                                    <span class="text-xs text-appMuted">Candidate Profile</span>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-2">
+                                <div class="flex justify-between text-xs">
+                                    <span class="text-appMuted font-medium">Similarity Score</span>
+                                    <span id="panelSimilarityScore" class="font-bold text-purple-400">92.1%</span>
+                                </div>
+                                <div class="w-full bg-[#0D1117] h-2.5 rounded-full overflow-hidden border border-appBorder">
+                                    <div id="panelSimilarityBar" class="h-full bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full transition-all duration-700"></div>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-2.5">
+                                <span class="text-[10px] font-bold text-green-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-check"></i> Matched Skills
+                                </span>
+                                <div id="panelMatchedList" class="flex flex-wrap gap-1.5"></div>
+                            </div>
+
+                            <div class="flex flex-col gap-2.5">
+                                <span class="text-[10px] font-bold text-red-400 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fa-solid fa-circle-xmark"></i> Missing Skills
+                                </span>
+                                <div id="panelMissingList" class="flex flex-wrap gap-1.5"></div>
+                            </div>
+                        </div>
+
+                        <!-- Tab Content: Resume PDF Viewer -->
+                        <div id="panelContentPdf" class="hidden flex flex-col gap-4 h-[480px] relative">
+                            <!-- Loader -->
+                            <div id="pdfLoader" class="absolute inset-0 bg-[#161B22]/80 flex items-center justify-center z-10 rounded-xl">
+                                <div class="flex flex-col items-center gap-2">
+                                    <svg class="animate-spin h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    <span class="text-xs text-appMuted">Loading PDF document...</span>
+                                </div>
+                            </div>
+                            <!-- PDF iframe -->
+                            <iframe id="pdfViewerFrame" class="w-full h-full rounded-xl border border-appBorder bg-appBg" src="about:blank"></iframe>
+                        </div>
+
+                        <!-- Tab Content: Recruiter AI Chat Assistant -->
+                        <div id="panelContentChat" class="hidden flex flex-col gap-3 h-[480px] relative">
+                            <!-- Scrollable Chat History -->
+                            <div id="chatHistory" class="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-3.5 p-4 bg-appBg rounded-xl border border-appBorder text-xs">
+                                <div class="flex flex-col gap-1.5 text-center text-appMuted py-8 select-none">
+                                    <div class="h-9 w-9 rounded-xl bg-purple-600/10 text-purple-400 border border-purple-500/20 flex items-center justify-center mx-auto text-base">
+                                        <i class="fa-solid fa-robot"></i>
+                                    </div>
+                                    <span class="font-bold text-white text-xs mt-2">ResumeAI Chat Assistant</span>
+                                    <span class="text-[10px] leading-relaxed max-w-[200px] mx-auto">Ask direct questions about the candidate's experience, technical stack, or projects.</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Suggestion Chips -->
+                            <div id="chatSuggestions" class="flex flex-wrap gap-1.5 p-0.5">
+                                <button type="button" class="chat-chip bg-[#161B22] border border-appBorder hover:border-purple-500/40 text-appMuted hover:text-purple-400 text-[10px] font-semibold px-2.5 py-1 rounded-full transition-all" data-q="Summarize profile">
+                                    📝 Summarize Profile
+                                </button>
+                                <button type="button" class="chat-chip bg-[#161B22] border border-appBorder hover:border-purple-500/40 text-appMuted hover:text-purple-400 text-[10px] font-semibold px-2.5 py-1 rounded-full transition-all" data-q="Check technical stack">
+                                    💻 Check Stack
+                                </button>
+                                <button type="button" class="chat-chip bg-[#161B22] border border-appBorder hover:border-purple-500/40 text-appMuted hover:text-purple-400 text-[10px] font-semibold px-2.5 py-1 rounded-full transition-all" data-q="Highlight key projects">
+                                    🛠️ Key Projects
+                                </button>
+                            </div>
+
+                            <!-- Input Bar -->
+                            <div class="flex gap-2">
+                                <input type="text" id="chatInput" placeholder="Ask about this resume..." 
+                                    class="flex-1 bg-appBg border border-appBorder rounded-xl px-4 py-2.5 text-xs text-white placeholder-appMuted/50 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-all">
+                                <button type="button" id="chatSendBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold w-10 h-9 rounded-xl flex items-center justify-center transition-all active:scale-[0.96] shadow-lg shadow-purple-600/10">
+                                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Skill Analysis Section -->
+                <div id="skillAnalysisSection" class="hidden flex flex-col gap-6 mt-8 border-t border-appBorder pt-8">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-md font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-simple text-[#F78166]"></i> Skill Analysis
+                        </h2>
+                        <button id="exportCsvBtn" class="bg-[#F78166] hover:bg-[#e06c53] text-white font-bold py-2 px-4 rounded-xl shadow-lg shadow-[#F78166]/10 text-xs flex items-center gap-2 transition-all active:scale-[0.98]">
+                            <i class="fa-solid fa-download"></i> Export Results (CSV)
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+                        <!-- Left: Skill Matrix Table -->
+                        <div class="lg:col-span-2 bg-[#161B22] border border-appBorder rounded-2xl p-6 shadow-xl flex flex-col gap-4">
+                            <h3 class="text-xs font-bold text-appMuted uppercase tracking-wider">Skill Match Matrix (Top 5 Candidates)</h3>
+                            <div class="w-full overflow-x-auto">
+                                <table class="w-full text-left border-collapse text-sm">
+                                    <thead>
+                                        <tr id="matrixHeaderRow" class="text-appMuted uppercase text-[10px] tracking-wider border-b border-appBorder">
+                                            <th class="pb-3 font-semibold text-xs">Required Skill</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="matrixTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Right: Per-Candidate Detail Accordion -->
+                        <div class="bg-[#161B22] border border-appBorder rounded-2xl p-6 shadow-xl flex flex-col gap-4">
+                            <h3 class="text-xs font-bold text-appMuted uppercase tracking-wider">Candidate Skill Breakdown</h3>
+                            <div id="accordionContainer" class="flex flex-col gap-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================================================
+               2. CANDIDATES DIRECTORY VIEW
+               ========================================================================== -->
+            <div id="view-candidates" class="view-panel flex flex-col gap-6 hidden animate-fade-in">
+                <div class="bg-appCard border border-appBorder rounded-2xl p-6 shadow-xl flex flex-col gap-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-appBorder pb-4">
+                        <div>
+                            <h2 class="text-md font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-folder-tree text-purple-400"></i> Talent Directory
+                            </h2>
+                            <p class="text-xs text-appMuted mt-0.5">Database of all evaluated applicant profiles in this session.</p>
+                        </div>
+                        <div class="relative max-w-sm w-full">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-appMuted text-xs"><i class="fa-solid fa-magnifying-glass"></i></span>
+                            <input type="text" id="candidateSearchInput" placeholder="Search candidates by name..." 
+                                class="w-full bg-appBg border border-appBorder rounded-xl pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-purple-500 transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Directory Empty State -->
+                    <div id="emptyDirState" class="flex flex-col items-center justify-center text-center py-20 gap-4">
+                        <i class="fa-solid fa-address-book text-3xl text-appMuted/30"></i>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">Directory is Empty</h3>
+                            <p class="text-xs text-appMuted mt-1">Screen candidates from the dashboard to populate the cumulative database.</p>
+                        </div>
+                    </div>
+
+                    <!-- Directory Table -->
+                    <div id="dirTableContainer" class="w-full overflow-x-auto hidden">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead>
+                                <tr class="text-appMuted uppercase text-[10px] tracking-wider border-b border-appBorder">
+                                    <th class="pb-3 font-semibold">Candidate</th>
+                                    <th class="pb-3 font-semibold">Latest Match Rating</th>
+                                    <th class="pb-3 font-semibold">Extracted Skills</th>
+                                    <th class="pb-3 font-semibold">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="directoryTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================================================
+               3. ANALYTICS VIEW
+               ========================================================================== -->
+            <div id="view-analytics" class="view-panel flex flex-col gap-6 hidden animate-fade-in">
+                <!-- Analytics Cards Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Average Match Card -->
+                    <div class="bg-appCard border border-appBorder rounded-2xl p-6 flex flex-col gap-3 shadow-xl">
+                        <div class="flex items-center justify-between border-b border-appBorder pb-3">
+                            <span class="text-[10px] font-bold text-appMuted uppercase tracking-wider">Average Similarity Match</span>
+                            <i class="fa-solid fa-chart-line text-purple-400"></i>
+                        </div>
+                        <span id="analyticsAvgMatch" class="text-4xl font-black text-white">0%</span>
+                        <p class="text-xs text-appMuted">Mean score computed across all evaluated resumes.</p>
+                    </div>
+
+                    <!-- Skill Match Rate Card -->
+                    <div class="bg-appCard border border-appBorder rounded-2xl p-6 flex flex-col gap-3 shadow-xl">
+                        <div class="flex items-center justify-between border-b border-appBorder pb-3">
+                            <span class="text-[10px] font-bold text-appMuted uppercase tracking-wider">Top Recruiter Skills Matches</span>
+                            <i class="fa-solid fa-check-double text-emerald-400"></i>
+                        </div>
+                        <span id="analyticsAvgSkillScore" class="text-4xl font-black text-emerald-400">0%</span>
+                        <p class="text-xs text-appMuted">Average rate of mandatory skills matched.</p>
+                    </div>
+
+                    <!-- Quality Fit Rating -->
+                    <div class="bg-appCard border border-appBorder rounded-2xl p-6 flex flex-col gap-3 shadow-xl">
+                        <div class="flex items-center justify-between border-b border-appBorder pb-3">
+                            <span class="text-[10px] font-bold text-appMuted uppercase tracking-wider">Fit Distribution</span>
+                            <i class="fa-solid fa-cubes-stacked text-sky-400"></i>
+                        </div>
+                        <span id="analyticsFitDistribution" class="text-xl font-extrabold text-white flex gap-1.5 items-baseline">
+                            <span id="highFitCount" class="text-green-400">0</span> <span class="text-xs text-appMuted">High</span> / 
+                            <span id="medFitCount" class="text-purple-400">0</span> <span class="text-xs text-appMuted">Med</span> / 
+                            <span id="lowFitCount" class="text-red-400">0</span> <span class="text-xs text-appMuted">Low</span>
+                        </span>
+                        <p class="text-xs text-appMuted">Distributions partitioned at 75% and 50% benchmarks.</p>
+                    </div>
+                </div>
+
+                <!-- Skill Deficit Gap Analysis Graph -->
+                <div class="bg-appCard border border-appBorder rounded-2xl p-6 shadow-xl flex flex-col gap-5">
+                    <div>
+                        <h2 class="text-md font-bold text-white">Skill Gap Deficit Analysis</h2>
+                        <p class="text-xs text-appMuted mt-0.5">Identifies critical talent deficits by analyzing how frequently required stack items are missing from candidates.</p>
+                    </div>
+
+                    <div id="analyticsEmptyState" class="py-16 text-center text-appMuted text-xs flex flex-col gap-2">
+                        <i class="fa-solid fa-chart-bar text-2xl text-appMuted/30"></i>
+                        <span>No skill gap data computed yet. Screen candidates to generate metrics.</span>
+                    </div>
+
+                    <div id="gapChartContainer" class="flex flex-col gap-4 hidden">
+                        <!-- Chart items loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================================================
+               4. JOBS TEMPLATE BOARD VIEW
+               ========================================================================== -->
+            <div id="view-jobs" class="view-panel flex flex-col gap-6 hidden animate-fade-in">
+                <div>
+                    <h2 class="text-md font-bold text-white">Active Job Profiles</h2>
+                    <p class="text-xs text-appMuted mt-0.5">Quickly select a job category to launch a custom screening overlay pre-filled with requirements.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Job Card 1 -->
+                    <div class="bg-[#161B22] border border-appBorder rounded-2xl p-6 hover:border-purple-500/35 transition-all flex flex-col justify-between h-72">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[9px] uppercase tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold px-2 py-0.5 rounded">Engineering</span>
+                                <i class="fa-solid fa-code text-appMuted"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white">Senior Backend Engineer</h3>
+                                <p class="text-xs text-appMuted mt-1">Requires expertise in Python, Flask/Django APIs, SQL databases, Docker orchestration, and AWS pipelines.</p>
+                            </div>
+                        </div>
+                        <button class="screen-template-btn w-full bg-appBg hover:bg-purple-600 border border-appBorder hover:border-transparent text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all" 
+                            data-title="Senior Backend Engineer" data-skills="Python, SQL, PostgreSQL, AWS, Docker, Kubernetes, Git, DevOps">
+                            Launch Screen <i class="fa-solid fa-arrow-pointer"></i>
+                        </button>
+                    </div>
+
+                    <!-- Job Card 2 -->
+                    <div class="bg-[#161B22] border border-appBorder rounded-2xl p-6 hover:border-purple-500/35 transition-all flex flex-col justify-between h-72">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[9px] uppercase tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold px-2 py-0.5 rounded">Data Science</span>
+                                <i class="fa-solid fa-brain text-appMuted"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white">Machine Learning Engineer</h3>
+                                <p class="text-xs text-appMuted mt-1">Requires core proficiency in Python, Machine Learning paradigms, Deep Learning algorithms, PyTorch frameworks, and SQL structures.</p>
+                            </div>
+                        </div>
+                        <button class="screen-template-btn w-full bg-appBg hover:bg-purple-600 border border-appBorder hover:border-transparent text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all" 
+                            data-title="Machine Learning Engineer" data-skills="Python, Machine Learning, Deep Learning, TensorFlow, PyTorch, SQL, Git">
+                            Launch Screen <i class="fa-solid fa-arrow-pointer"></i>
+                        </button>
+                    </div>
+
+                    <!-- Job Card 3 -->
+                    <div class="bg-[#161B22] border border-appBorder rounded-2xl p-6 hover:border-purple-500/35 transition-all flex flex-col justify-between h-72">
+                        <div class="flex flex-col gap-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[9px] uppercase tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/20 font-bold px-2 py-0.5 rounded">Frontend</span>
+                                <i class="fa-solid fa-palette text-appMuted"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-white">Frontend Web Developer</h3>
+                                <p class="text-xs text-appMuted mt-1">Requires expertise in modern JavaScript, TypeScript architectures, React layouts, HTML frameworks, and stylesheet structures.</p>
+                            </div>
+                        </div>
+                        <button class="screen-template-btn w-full bg-appBg hover:bg-purple-600 border border-appBorder hover:border-transparent text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all" 
+                            data-title="Frontend Web Developer" data-skills="JavaScript, TypeScript, React, HTML, CSS, Git">
+                            Launch Screen <i class="fa-solid fa-arrow-pointer"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==========================================================================
+               5. CONFIGURATIONS & SETTINGS VIEW
+               ========================================================================== -->
+            <div id="view-settings" class="view-panel flex flex-col gap-6 hidden animate-fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+                    
+                    <!-- Left Column: User Profile Card -->
+                    <div class="bg-[#161B22] border border-appBorder rounded-2xl p-6 shadow-xl flex flex-col gap-6">
+                        <div class="border-b border-appBorder pb-4">
+                            <h2 class="text-md font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-circle-user text-purple-400"></i> Profile Details
+                            </h2>
+                            <p class="text-xs text-appMuted mt-0.5">Your active session identity and workspace info.</p>
+                        </div>
+
+                        <!-- User Profile Card Details -->
+                        <div class="flex flex-col items-center text-center gap-3">
+                            <div class="h-20 w-20 rounded-full bg-gradient-to-tr from-[#F78166] to-purple-600 p-[3px] shadow-lg shadow-purple-600/10 relative">
+                                <div class="w-full h-full bg-[#161B22] rounded-full flex items-center justify-center text-white text-2xl font-black">
+                                    {{ session.username[:2].upper() if session.username else 'US' }}
+                                </div>
+                                <span class="absolute bottom-0 right-1 h-4 w-4 bg-green-500 border-2 border-[#161B22] rounded-full animate-pulse"></span>
+                            </div>
+                            <div>
+                                <h3 class="text-md font-bold text-white">{{ session.username }}</h3>
+                                <span class="inline-block mt-1 text-[9px] uppercase tracking-wider bg-purple-600/10 text-purple-400 border border-purple-500/20 font-bold px-2 py-0.5 rounded-full">
+                                    Workspace Owner
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Info Metadata list -->
+                        <div class="flex flex-col gap-4 border-t border-appBorder/50 pt-4 text-xs">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-[10px] text-appMuted font-bold uppercase tracking-wider">Email Address</span>
+                                <span class="text-white font-medium break-all">{{ user.email if user else 'N/A' }}</span>
+                            </div>
+
+                            <div class="flex flex-col gap-1 border-t border-appBorder/30 pt-3">
+                                <span class="text-[10px] text-appMuted font-bold uppercase tracking-wider">Workspace Joined</span>
+                                <span class="text-white font-medium">
+                                    {{ user.created_at if user else 'N/A' }}
+                                </span>
+                            </div>
+
+                            <div class="flex flex-col gap-1 border-t border-appBorder/30 pt-3">
+                                <span class="text-[10px] text-appMuted font-bold uppercase tracking-wider">Account Role</span>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <span class="inline-block h-2 w-2 rounded-full bg-purple-400 shadow-sm shadow-purple-400/50"></span>
+                                    <span class="text-white font-medium">Enterprise Administrator</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col gap-1 border-t border-appBorder/30 pt-3">
+                                <span class="text-[10px] text-appMuted font-bold uppercase tracking-wider">Deployment Region</span>
+                                <span class="text-white font-medium flex items-center gap-1.5">
+                                    <i class="fa-solid fa-earth-asia text-appMuted text-[10px]"></i> ap-south-1 (Mumbai)
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Reset Workspace Button -->
+                        <button type="button" id="resetWorkspaceBtn"
+                            class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 hover:border-red-500/50 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition-all active:scale-[0.98]">
+                            <i class="fa-solid fa-trash-can"></i> Reset Workspace Data
+                        </button>
+                    </div>
+
+                    <!-- Right Column: System Preferences -->
+                    <div class="lg:col-span-2 bg-[#161B22] border border-appBorder rounded-2xl p-6 shadow-xl flex flex-col gap-6">
+                        <div class="border-b border-appBorder pb-4">
+                            <h2 class="text-md font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-purple-400"></i> System Preferences
+                            </h2>
+                            <p class="text-xs text-appMuted mt-0.5">Configure rank thresholds, vectorizer algorithms, and parser attributes.</p>
+                        </div>
+
+                        <div class="flex flex-col gap-6">
+                            <!-- Dynamic Threshold Control -->
+                            <div class="flex flex-col gap-2">
+                                <div class="flex justify-between text-xs font-semibold">
+                                    <label for="thresholdSlider" class="text-white">Minimum Similarity Filter Threshold</label>
+                                    <span id="thresholdValue" class="text-purple-400 font-bold">0%</span>
+                                </div>
+                                <input type="range" id="thresholdSlider" min="0" max="90" value="0" 
+                                    class="w-full accent-purple-500 bg-appBg border border-appBorder rounded-lg h-2 outline-none cursor-pointer">
+                                <p class="text-[10px] text-appMuted">Filters out candidates scoring below this rate from the active rankings view in real-time.</p>
+                            </div>
+
+                            <!-- Model Selection -->
+                            <div class="flex flex-col gap-2 border-t border-appBorder/40 pt-4">
+                                <label class="text-xs font-semibold text-white">Default Vectorizer Pipeline</label>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+                                    <button type="button" class="bg-purple-600/10 border border-purple-500/40 px-4 py-3 rounded-xl text-xs font-bold text-purple-400 flex items-center gap-2 transition-all select-model-btn" data-model="tfidf">
+                                        <i class="fa-solid fa-circle-dot"></i> Lexical TF-IDF
+                                    </button>
+                                    <button type="button" class="bg-appBg border border-appBorder hover:border-purple-500/40 px-4 py-3 rounded-xl text-xs font-bold text-appMuted flex items-center gap-2 transition-all select-model-btn" data-model="sbert">
+                                        <i class="fa-solid fa-circle text-[8px]"></i> Neural SBERT (v2)
+                                    </button>
+                                </div>
+                                <p class="text-[10px] text-appMuted">Note: Neural SBERT model requires the advanced code module and pip installation of 'sentence-transformers'.</p>
+                            </div>
+
+                            <!-- Advanced Matching Options -->
+                            <div class="flex flex-col gap-3 border-t border-appBorder/40 pt-4">
+                                <label class="text-xs font-semibold text-white">Advanced Search & Parse Options</label>
+                                <div class="flex flex-col gap-3.5 mt-1">
+                                    <!-- Option 1: Semantic Match Mode -->
+                                    <div class="flex items-start gap-3">
+                                        <div class="flex items-center h-5">
+                                            <input id="optSemantic" type="checkbox" checked
+                                                class="w-4 h-4 text-purple-600 bg-appBg border-appBorder rounded focus:ring-purple-500 focus:ring-2 focus:ring-offset-appBg">
+                                        </div>
+                                        <div class="text-xs">
+                                            <label for="optSemantic" class="font-bold text-white">Enable Semantic Skill Synonyms</label>
+                                            <p class="text-[10px] text-appMuted">Equate related terms (e.g., 'React' and 'ReactJS', 'AWS' and 'Amazon Web Services') during matching.</p>
+                                        </div>
+                                    </div>
+                                    <!-- Option 2: High-Fidelity PDF Parser -->
+                                    <div class="flex items-start gap-3 border-t border-appBorder/20 pt-3">
+                                        <div class="flex items-center h-5">
+                                            <input id="optParser" type="checkbox" checked
+                                                class="w-4 h-4 text-purple-600 bg-appBg border-appBorder rounded focus:ring-purple-500 focus:ring-2 focus:ring-offset-appBg">
+                                        </div>
+                                        <div class="text-xs">
+                                            <label for="optParser" class="font-bold text-white">Use High-Fidelity Layout Parser</label>
+                                            <p class="text-[10px] text-appMuted">Parse complex tabular columns and layouts in resumes to avoid skill extraction omissions.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       MODAL DIALOG FOR NEW SCREENING (JD + Resumes)
+       ========================================================================== -->
+    <div id="screeningModal" class="fixed inset-0 bg-appBg/80 backdrop-blur-sm flex items-center justify-center z-50 p-4 hidden">
+        <div class="w-full max-w-2xl bg-[#161B22] border border-appBorder rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+            <!-- Modal Header -->
+            <div class="px-6 py-5 border-b border-appBorder flex justify-between items-center bg-[#1c212b]">
+                <div>
+                    <h2 class="text-md font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-wand-magic-sparkles text-purple-400"></i> New Candidate Screening
+                    </h2>
+                    <p class="text-xs text-appMuted mt-0.5">Input target job details and upload PDF files to screen.</p>
+                </div>
+                <button id="closeScreeningModal" class="text-appMuted hover:text-white text-lg transition-all"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Modal Form -->
+            <form id="screeningForm" class="p-6 flex flex-col gap-5">
+                <!-- Job Description Input -->
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center">
+                        <label for="jd" class="text-xs font-bold uppercase tracking-wider text-appMuted">Job Description</label>
+                        <button type="button" id="loadSampleBtn" class="text-xs text-purple-400 hover:text-purple-300 transition-all font-medium flex items-center gap-1">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Load Sample
+                        </button>
+                    </div>
+                    <textarea id="jd" name="jd" rows="6" 
+                        class="bg-appBg border border-appBorder rounded-xl p-3 text-sm text-white placeholder-appMuted/60 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition-all custom-scrollbar resize-none"
+                        placeholder="Paste the Job Description requirements and skills lists here..." required></textarea>
+                </div>
+
+                <!-- File Drag and Drop zone -->
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-xs font-bold uppercase tracking-wider text-appMuted font-bold">Select Resumes (PDF Only)</label>
+                        <span id="fileCountBadge" class="bg-appBg text-purple-400 border border-appBorder text-[10px] font-bold px-2 py-0.5 rounded-full hidden">0 Files</span>
+                    </div>
+                    
+                    <div id="dropzone" class="border-2 border-dashed border-appBorder hover:border-purple-500 rounded-xl bg-appBg/40 hover:bg-purple-500/5 p-6 text-center relative cursor-pointer transition-all flex flex-col items-center justify-center gap-2 group">
+                        <input type="file" id="resumes" name="resumes" multiple accept=".pdf" class="absolute inset-0 opacity-0 cursor-pointer">
+                        <div class="h-10 w-10 rounded-xl bg-appCard flex items-center justify-center text-appMuted group-hover:text-purple-400 group-hover:scale-105 transition-all">
+                            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-white">Drag & drop resume PDF files</p>
+                            <p class="text-[10px] text-appMuted mt-0.5">or <span class="text-purple-400 underline">browse files</span> (max 16MB)</p>
+                        </div>
+                    </div>
+
+                    <!-- File Chips List -->
+                    <div id="fileList" class="flex flex-wrap gap-2 mt-2 max-h-32 overflow-y-auto custom-scrollbar"></div>
+                </div>
+
+                <!-- Action Submit Button -->
+                <div class="border-t border-appBorder pt-5 flex justify-end gap-3">
+                    <button type="button" id="cancelBtn" class="bg-transparent hover:bg-appCard text-appMuted hover:text-white border border-appBorder font-bold py-2.5 px-5 rounded-xl text-xs transition-all">
+                        Cancel
+                    </button>
+                    <button type="submit" id="submitBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-6 rounded-xl shadow-lg shadow-purple-600/20 text-xs flex items-center gap-2 transition-all active:scale-[0.98]">
+                        <span id="btnText">Execute Screen</span>
+                        <i id="btnIcon" class="fa-solid fa-arrow-right"></i>
+                        <svg id="btnSpinner" class="animate-spin h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==========================================================================
+       JAVASCRIPT APP DRIVER
+       ========================================================================== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Update Current Date
+            const dateEl = document.getElementById('currentDate');
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            dateEl.textContent = new Date().toLocaleDateString('en-US', options);
+
+            // ==========================================================================
+            // SPA NAVIGATION CONTROLLER
+            // ==========================================================================
+            const navItems = document.querySelectorAll('.nav-item');
+            const viewPanels = document.querySelectorAll('.view-panel');
+            const currentViewTitle = document.getElementById('currentViewTitle');
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    const viewId = e.currentTarget.getAttribute('data-view');
+                    
+                    // Switch sidebar selection state
+                    navItems.forEach(nav => {
+                        nav.className = "nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-appMuted hover:text-white hover:bg-appCard/50 text-sm font-medium transition-all text-left";
+                    });
+                    e.currentTarget.className = "nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-xl bg-purple-600/10 text-purple-400 border border-purple-500/20 text-sm font-semibold transition-all text-left";
+
+                    // Hide all viewports and display target viewport
+                    viewPanels.forEach(panel => panel.classList.add('hidden'));
+                    document.getElementById(`view-${viewId}`).classList.remove('hidden');
+
+                    // Set header title dynamically
+                    if (viewId === 'dashboard') currentViewTitle.textContent = "Ranking System";
+                    else if (viewId === 'candidates') currentViewTitle.textContent = "Talent Directory";
+                    else if (viewId === 'analytics') currentViewTitle.textContent = "Recruitment Insights";
+                    else if (viewId === 'jobs') currentViewTitle.textContent = "Job Profiles";
+                    else if (viewId === 'settings') currentViewTitle.textContent = "System Preferences";
+                });
+            });
+
+            // ==========================================================================
+            // MODAL TRIGGERS & ACTIONS
+            // ==========================================================================
+            const screeningModal = document.getElementById('screeningModal');
+            const openModalBtn = document.getElementById('openScreeningModal');
+            const closeModalBtn = document.getElementById('closeScreeningModal');
+            const cancelBtn = document.getElementById('cancelBtn');
+
+            openModalBtn.addEventListener('click', () => {
+                screeningModal.classList.remove('hidden');
+            });
+
+            [closeModalBtn, cancelBtn].forEach(btn => {
+                btn.addEventListener('click', () => {
+                    screeningModal.classList.add('hidden');
+                });
+            });
+
+            // Form Inputs Elements
+            const form = document.getElementById('screeningForm');
+            const jdTextarea = document.getElementById('jd');
+            const loadSampleBtn = document.getElementById('loadSampleBtn');
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('resumes');
+            const fileListContainer = document.getElementById('fileList');
+            const fileCountBadge = document.getElementById('fileCountBadge');
+
+            // Dashboard Output Panels
+            const emptyTableState = document.getElementById('emptyTableState');
+            const tableContainer = document.getElementById('tableContainer');
+            const rankingsTableBody = document.getElementById('rankingsTableBody');
+            const analysisPanel = document.getElementById('analysisPanel');
+
+            // Stats Elements
+            const statTotal = document.getElementById('statTotal');
+            const statTopScore = document.getElementById('statTopScore');
+            const statTopSubtext = document.getElementById('statTopSubtext');
+            const statInReview = document.getElementById('statInReview');
+
+            // Float Card Details
+            const panelName = document.getElementById('panelName');
+            const panelRankBadge = document.getElementById('panelRankBadge');
+            const panelSubtitle = document.getElementById('panelSubtitle');
+            const panelSimilarityScore = document.getElementById('panelSimilarityScore');
+            const panelSimilarityBar = document.getElementById('panelSimilarityBar');
+            const panelMatchedList = document.getElementById('panelMatchedList');
+            const panelMissingList = document.getElementById('panelMissingList');
+
+            // Form Submit indicators
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            const btnSpinner = document.getElementById('btnSpinner');
+
+            // Settings Configurations
+            const thresholdSlider = document.getElementById('thresholdSlider');
+            const thresholdValue = document.getElementById('thresholdValue');
+            const selectModelBtns = document.querySelectorAll('.select-model-btn');
+
+            // Dynamic Session State Stores
+            const CURRENT_USER = "{{ session.username }}";
+            const RESPONSE_DATA_KEY = `${CURRENT_USER}_responseData`;
+            const CUMULATIVE_CANDIDATES_KEY = `${CURRENT_USER}_cumulativeCandidates`;
+            const LAST_JD_KEY = `${CURRENT_USER}_lastJd`;
+
+            let selectedFiles = [];
+            let responseData = null;
+            try {
+                const savedResponse = localStorage.getItem(RESPONSE_DATA_KEY);
+                if (savedResponse && savedResponse !== 'undefined' && savedResponse !== 'null') {
+                    responseData = JSON.parse(savedResponse);
+                }
+            } catch (e) {
+                console.error("Error loading responseData from localStorage:", e);
+                localStorage.removeItem(RESPONSE_DATA_KEY);
+            }
+
+            let cumulativeCandidates = {}; // Cumulative store mapping name to candidate summary
+            try {
+                const savedCumulative = localStorage.getItem(CUMULATIVE_CANDIDATES_KEY);
+                if (savedCumulative && savedCumulative !== 'undefined' && savedCumulative !== 'null') {
+                    cumulativeCandidates = JSON.parse(savedCumulative);
+                }
+            } catch (e) {
+                console.error("Error loading cumulativeCandidates from localStorage:", e);
+                localStorage.removeItem(CUMULATIVE_CANDIDATES_KEY);
+            }
+
+            // Seeding mock candidates for testuser_new if empty (useful for automated testing)
+            if (CURRENT_USER === "testuser_new" && Object.keys(cumulativeCandidates).length === 0) {
+                console.log("Seeding mock candidates for testuser_new...");
+                cumulativeCandidates = {
+                    "candidate_alex.pdf": {
+                        name: "candidate_alex.pdf",
+                        score: 85.5,
+                        skill_score: 66.7,
+                        found: ["Python", "SQL", "Git", "AWS"],
+                        missing: ["Machine Learning", "Data Structures"]
+                    },
+                    "candidate_sarah.pdf": {
+                        name: "candidate_sarah.pdf",
+                        score: 92.0,
+                        skill_score: 100.0,
+                        found: ["Python", "Machine Learning", "SQL", "Data Structures", "Git", "AWS"],
+                        missing: []
+                    }
+                };
+                localStorage.setItem(CUMULATIVE_CANDIDATES_KEY, JSON.stringify(cumulativeCandidates));
+            }
+
+            let similarityFilterThreshold = thresholdSlider ? (parseInt(thresholdSlider.value) || 0) : 0; // Align with slider's actual DOM value
+
+            // Sample JD template
+            const SAMPLE_JD = `Job Title: Senior Backend & DevOps Engineer
+
+Role Overview:
+We are seeking a senior software engineer to lead the design and implementation of backend systems and deployment pipelines. You will write high-quality services, integrate databases, containerize services, and deploy applications to cloud infrastructures.
+
+Responsibilities:
+- Write backend code, design APIs, and build services using Python.
+- Deploy robust database systems using SQL and PostgreSQL.
+- Containerize components with Docker and manage orchestrations in Kubernetes.
+- Configure cloud infrastructures on AWS.
+- Use Git and DevOps practices to maintain continuous integration.
+
+Technical Skills Required:
+Python, SQL, PostgreSQL, AWS, Docker, Kubernetes, Git, DevOps.`;
+
+            // Load sample JD
+            loadSampleBtn.addEventListener('click', () => {
+                jdTextarea.value = SAMPLE_JD;
+                localStorage.setItem(LAST_JD_KEY, SAMPLE_JD);
+            });
+
+            // Save JD on input
+            jdTextarea.addEventListener('input', () => {
+                localStorage.setItem(LAST_JD_KEY, jdTextarea.value);
+            });
+
+            // Load last JD if exists
+            const lastJd = localStorage.getItem(LAST_JD_KEY);
+            if (lastJd) {
+                jdTextarea.value = lastJd;
+            }
+
+            // Drag and Drop File Handlers
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.add('border-purple-500', 'bg-purple-500/5');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.remove('border-purple-500', 'bg-purple-500/5');
+                    if (eventName === 'drop') {
+                        const dt = e.dataTransfer;
+                        handleFiles(dt.files);
+                    }
+                });
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                handleFiles(e.target.files);
+            });
+
+            function handleFiles(files) {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (!file.name.toLowerCase().endsWith('.pdf')) {
+                        alert(`Please select PDF resumes only. Skipping "${file.name}".`);
+                        continue;
+                    }
+                    if (selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                        continue;
+                    }
+                    selectedFiles.push(file);
+                }
+                renderFileList();
+            }
+
+            function renderFileList() {
+                fileListContainer.innerHTML = '';
+
+                if (selectedFiles.length === 0) {
+                    fileCountBadge.classList.add('hidden');
+                    fileInput.required = true;
+                    return;
+                }
+
+                fileInput.required = false;
+                fileCountBadge.textContent = `${selectedFiles.length} File${selectedFiles.length > 1 ? 's' : ''}`;
+                fileCountBadge.classList.remove('hidden');
+
+                selectedFiles.forEach((file, index) => {
+                    const sizeInMb = (file.size / (1024 * 1024)).toFixed(2);
+                    const chip = document.createElement('div');
+                    chip.className = 'flex items-center justify-between gap-2 bg-appBg border border-appBorder px-2.5 py-1 rounded-lg text-xs animate-fade-in';
+                    chip.innerHTML = `
+                        <div class="flex items-center gap-1.5 overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px]">
+                            <i class="fa-solid fa-file-pdf text-red-500"></i>
+                            <span class="font-medium text-white">${file.name}</span>
+                            <span class="text-[9px] text-appMuted">(${sizeInMb}MB)</span>
+                        </div>
+                        <button type="button" class="text-appMuted hover:text-red-400 remove-file-btn" data-index="${index}">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    `;
+                    fileListContainer.appendChild(chip);
+                });
+
+                document.querySelectorAll('.remove-file-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const idx = parseInt(e.currentTarget.getAttribute('data-index'));
+                        selectedFiles.splice(idx, 1);
+                        renderFileList();
+                    });
+                });
+            }
+
+            // Form Submit POST request
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const jdVal = jdTextarea.value.trim();
+                if (!jdVal) {
+                    alert('Please provide a Job Description.');
+                    return;
+                }
+
+                if (selectedFiles.length === 0) {
+                    alert('Please upload at least one PDF resume.');
+                    return;
+                }
+
+                // Show button loader
+                submitBtn.disabled = true;
+                btnText.textContent = "Processing...";
+                btnIcon.classList.add('hidden');
+                btnSpinner.classList.remove('hidden');
+
+                const formData = new FormData();
+                formData.append('jd', jdVal);
+                selectedFiles.forEach(file => {
+                    formData.append('resumes', file);
+                });
+
+                try {
+                    const response = await fetch('/rank', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.error || 'Server error occurred during matching pipeline.');
+                    }
+
+                    responseData = data;
+                    localStorage.setItem(RESPONSE_DATA_KEY, JSON.stringify(data));
+                    
+                    // Close Modal
+                    screeningModal.classList.add('hidden');
+                    
+                    // Append newly evaluated candidates to the cumulative session cache
+                    data.results.forEach(candidate => {
+                        const name = candidate.name;
+                        const skillInfo = data.skill_breakdown[name] || { found: [], missing: [], skill_score: 0.0 };
+                        cumulativeCandidates[name] = {
+                            name: name,
+                            score: candidate.score,
+                            skill_score: skillInfo.skill_score,
+                            found: skillInfo.found,
+                            missing: skillInfo.missing
+                        };
+                    });
+                    localStorage.setItem(CUMULATIVE_CANDIDATES_KEY, JSON.stringify(cumulativeCandidates));
+
+                    // Render UI Dashboard components
+                    renderDashboard();
+                    renderDirectory();
+                    renderAnalytics();
+
+                } catch (error) {
+                    console.error('Screening Error:', error);
+                    alert(`System Error:\n${error.message}`);
+                } finally {
+                    // Reset Button
+                    submitBtn.disabled = false;
+                    btnText.textContent = "Execute Screen";
+                    btnIcon.classList.remove('hidden');
+                    btnSpinner.classList.add('hidden');
+                }
+            });
+
+            // ==========================================================================
+            // RENDER FUNCTIONS
+            // ==========================================================================
+
+            // 1. Render Dashboard View (Scores and Rankings)
+            function renderDashboard() {
+                const candidatesArray = Object.values(cumulativeCandidates);
+                
+                // Sort candidates by similarity score descending
+                candidatesArray.sort((a, b) => b.score - a.score);
+
+                // Filter candidates by similarityFilterThreshold
+                const filteredCandidates = candidatesArray.filter(c => c.score >= similarityFilterThreshold);
+
+                // Update Stats
+                if (statTotal) statTotal.textContent = candidatesArray.length;
+
+                if (statTopScore) {
+                    if (candidatesArray.length > 0) {
+                        statTopScore.textContent = `${candidatesArray[0].score}%`;
+                    } else {
+                        statTopScore.textContent = "0%";
+                    }
+                }
+
+                if (statTopSubtext) {
+                    const over70Count = candidatesArray.filter(c => c.score >= 70).length;
+                    statTopSubtext.textContent = `${over70Count} candidate${over70Count !== 1 ? 's' : ''} over 70%`;
+                }
+
+                if (statInReview) {
+                    statInReview.textContent = filteredCandidates.length;
+                }
+
+                // Render Table
+                if (filteredCandidates.length === 0) {
+                    if (emptyTableState) emptyTableState.classList.remove('hidden');
+                    if (tableContainer) tableContainer.classList.add('hidden');
+                    const sectionEl = document.getElementById('skillAnalysisSection');
+                    if (sectionEl) sectionEl.classList.add('hidden');
+                    return;
+                }
+
+                if (emptyTableState) emptyTableState.classList.add('hidden');
+                if (tableContainer) tableContainer.classList.remove('hidden');
+                if (rankingsTableBody) {
+                    rankingsTableBody.innerHTML = '';
+
+                    filteredCandidates.forEach((candidate, index) => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-b border-appBorder hover:bg-appCard/50 transition-all cursor-pointer';
+                        tr.addEventListener('click', () => {
+                            document.querySelectorAll('#rankingsTableBody tr').forEach(r => {
+                                r.classList.remove('bg-purple-600/5', 'border-purple-500/30');
+                            });
+                            tr.classList.add('bg-purple-600/5', 'border-purple-500/30');
+                            openAnalysisPanel(candidate.name);
+                        });
+
+                        let rankBadgeClass = 'bg-[#1F242C] text-appMuted border-appBorder';
+                        const rank = index + 1;
+                        if (rank === 1) {
+                            rankBadgeClass = 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+                        } else if (rank <= 3) {
+                            rankBadgeClass = 'bg-sky-500/10 text-sky-400 border-sky-500/20';
+                        }
+
+                        tr.innerHTML = `
+                            <td class="py-4">
+                                <span class="inline-flex items-center justify-center h-5 w-5 rounded text-[10px] font-bold border ${rankBadgeClass}">
+                                    ${rank}
+                                </span>
+                            </td>
+                            <td class="py-4 font-bold text-white max-w-[200px] truncate" title="${candidate.name}">
+                                ${candidate.name}
+                            </td>
+                            <td class="py-4">
+                                <span class="font-bold text-purple-400 text-xs">${candidate.score}%</span>
+                            </td>
+                            <td class="py-4">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-16 bg-[#0D1117] h-1.5 rounded-full overflow-hidden border border-appBorder">
+                                        <div class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full" style="width: ${candidate.skill_score}%"></div>
+                                    </div>
+                                    <span class="text-xs font-semibold text-emerald-400">${candidate.skill_score}%</span>
+                                </div>
+                            </td>
+                        `;
+                        rankingsTableBody.appendChild(tr);
+                    });
+
+                    // Auto-select first row on render if any candidate is present
+                    if (filteredCandidates.length > 0) {
+                        const firstRow = rankingsTableBody.firstElementChild;
+                        if (firstRow) {
+                            firstRow.click();
+                        }
+                    }
+                }
+
+                // Render skill analysis matrix and accordion
+                renderSkillAnalysis(filteredCandidates, cumulativeCandidates);
+                setupCsvExport(filteredCandidates, cumulativeCandidates);
+            }
+            
+
+            // Tab Elements
+            const tabBtnSkill = document.getElementById('tabBtnSkill');
+            const tabBtnPdf = document.getElementById('tabBtnPdf');
+            const tabBtnChat = document.getElementById('tabBtnChat');
+            const panelContentSkill = document.getElementById('panelContentSkill');
+            const panelContentPdf = document.getElementById('panelContentPdf');
+            const panelContentChat = document.getElementById('panelContentChat');
+            const pdfViewerFrame = document.getElementById('pdfViewerFrame');
+            const pdfLoader = document.getElementById('pdfLoader');
+
+            // Chat Elements
+            const chatHistory = document.getElementById('chatHistory');
+            const chatInput = document.getElementById('chatInput');
+            const chatSendBtn = document.getElementById('chatSendBtn');
+            const chatSuggestions = document.getElementById('chatSuggestions');
+            let currentChatCandidate = null;
+
+            function setActiveTab(activeTabId) {
+                const tabs = [
+                    { btn: tabBtnSkill, content: panelContentSkill },
+                    { btn: tabBtnPdf, content: panelContentPdf },
+                    { btn: tabBtnChat, content: panelContentChat }
+                ];
+                tabs.forEach(tab => {
+                    if (!tab.btn || !tab.content) return;
+                    if (tab.btn.id === activeTabId) {
+                        tab.btn.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider text-purple-400 border-b-2 border-purple-500 focus:outline-none transition-all";
+                        tab.content.classList.remove('hidden');
+                    } else {
+                        tab.btn.className = "flex-1 pb-3 text-xs font-bold uppercase tracking-wider text-appMuted hover:text-white border-b-2 border-transparent focus:outline-none transition-all";
+                        tab.content.classList.add('hidden');
+                    }
+                });
+            }
+
+            if (tabBtnSkill) {
+                tabBtnSkill.addEventListener('click', () => setActiveTab('tabBtnSkill'));
+            }
+            if (tabBtnPdf) {
+                tabBtnPdf.addEventListener('click', () => setActiveTab('tabBtnPdf'));
+            }
+            if (tabBtnChat) {
+                tabBtnChat.addEventListener('click', () => {
+                    setActiveTab('tabBtnChat');
+                    if (chatHistory) {
+                        chatHistory.scrollTop = chatHistory.scrollHeight;
+                    }
+                });
+            }
+
+            if (pdfViewerFrame && pdfLoader) {
+                pdfViewerFrame.onload = () => {
+                    pdfLoader.classList.add('hidden');
+                };
+            }
+
+            // --- Chat Assistant Controllers & Helpers ---
+            function escapeHtml(text) {
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            function formatMarkdown(text) {
+                if (!text) return "";
+                let html = text;
+                html = html
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;");
+                
+                // Headings
+                html = html.replace(/^### (.*?)$/gm, '<h3 class="text-xs font-bold text-white mt-3 mb-1.5 uppercase tracking-wider">$1</h3>');
+                html = html.replace(/^## (.*?)$/gm, '<h4 class="text-sm font-bold text-white mt-3 mb-1.5">$1</h4>');
+                html = html.replace(/^# (.*?)$/gm, '<h5 class="text-base font-bold text-white mt-3 mb-1.5">$1</h5>');
+
+                // Blockquotes (using escaped > which is &gt;)
+                html = html.replace(/^&gt;\s?(.*?)$/gm, '<blockquote class="border-l-2 border-purple-500 pl-3 my-2 text-appMuted italic">$1</blockquote>');
+
+                // Bold & Italic
+                html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-white">$1</strong>');
+                html = html.replace(/\*(.*?)\*/g, '<em class="italic text-appMuted">$1</em>');
+
+                // List items
+                html = html.replace(/^\-\s(.*?)$/gm, '<li class="ml-3 list-disc pl-0.5 text-appMuted my-1">$1</li>');
+
+                // Newlines
+                html = html.replace(/\n/g, '<br>');
+                
+                return html;
+            }
+
+            function resetChatHistory(candidateName) {
+                currentChatCandidate = candidateName;
+                if (!chatHistory) return;
+                
+                chatHistory.innerHTML = `
+                    <div class="flex flex-col gap-1.5 text-center text-appMuted py-8 select-none">
+                        <div class="h-9 w-9 rounded-xl bg-purple-600/10 text-purple-400 border border-purple-500/20 flex items-center justify-center mx-auto text-base animate-pulse">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <span class="font-bold text-white text-xs mt-2">ResumeAI Chat Assistant</span>
+                        <span class="text-[10px] leading-relaxed max-w-[200px] mx-auto">Ask direct questions about <strong class="text-purple-400">${candidateName}</strong>'s experience, technical stack, or key projects.</span>
+                    </div>
+                `;
+                
+                if (chatInput) {
+                    chatInput.value = '';
+                }
+            }
+
+            async function sendChatMessage(customQuestion = null) {
+                const questionText = customQuestion ? customQuestion.trim() : (chatInput ? chatInput.value.trim() : "");
+                if (!questionText || !currentChatCandidate) return;
+
+                if (!customQuestion && chatInput) {
+                    chatInput.value = '';
+                }
+
+                // Append user bubble
+                const userBubble = document.createElement('div');
+                userBubble.className = "flex flex-col items-end gap-1 animate-fade-in";
+                userBubble.innerHTML = `
+                    <div class="bg-purple-600 text-white rounded-2xl rounded-tr-none px-3.5 py-2 max-w-[85%] break-words shadow-md shadow-purple-600/10 font-medium leading-relaxed">
+                        ${escapeHtml(questionText)}
+                    </div>
+                    <span class="text-[9px] text-appMuted mr-1">You</span>
+                `;
+                chatHistory.appendChild(userBubble);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+
+                // Append typing indicator
+                const indicator = document.createElement('div');
+                indicator.id = "chatTypingIndicator";
+                indicator.className = "flex flex-col items-start gap-1 animate-fade-in";
+                indicator.innerHTML = `
+                    <div class="bg-[#161B22] border border-appBorder rounded-2xl rounded-tl-none px-3.5 py-2.5 flex items-center gap-1.5 shadow-sm">
+                        <span class="h-1.5 w-1.5 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                        <span class="h-1.5 w-1.5 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                        <span class="h-1.5 w-1.5 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                    </div>
+                    <span class="text-[9px] text-appMuted ml-1">AI is scanning resume...</span>
+                `;
+                chatHistory.appendChild(indicator);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+
+                try {
+                    const response = await fetch('/chat-resume', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            filename: currentChatCandidate,
+                            question: questionText
+                        })
+                    });
+
+                    const data = await response.json();
+                    
+                    const indicatorEl = document.getElementById('chatTypingIndicator');
+                    if (indicatorEl) indicatorEl.remove();
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.error || 'Failed to scan candidate resume.');
+                    }
+
+                    const aiBubble = document.createElement('div');
+                    aiBubble.className = "flex flex-col items-start gap-1 animate-fade-in";
+                    aiBubble.innerHTML = `
+                        <div class="bg-[#161B22] border border-appBorder text-[#c9d1d9] rounded-2xl rounded-tl-none px-3.5 py-2 max-w-[85%] break-words shadow-sm leading-relaxed">
+                            ${formatMarkdown(data.answer)}
+                        </div>
+                        <span class="text-[9px] text-appMuted ml-1">AI Assistant</span>
+                    `;
+                    chatHistory.appendChild(aiBubble);
+                    
+                } catch (error) {
+                    console.error("Chat Error:", error);
+                    const indicatorEl = document.getElementById('chatTypingIndicator');
+                    if (indicatorEl) indicatorEl.remove();
+
+                    const errBubble = document.createElement('div');
+                    errBubble.className = "flex flex-col items-start gap-1 animate-fade-in";
+                    errBubble.innerHTML = `
+                        <div class="bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl rounded-tl-none px-3.5 py-2 max-w-[85%] break-words shadow-sm leading-relaxed">
+                            <i class="fa-solid fa-triangle-exclamation mr-1"></i> Error: ${escapeHtml(error.message)}
+                        </div>
+                        <span class="text-[9px] text-appMuted ml-1">System</span>
+                    `;
+                    chatHistory.appendChild(errBubble);
+                } finally {
+                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                }
+            }
+
+            // Hook up chat event listeners
+            if (chatInput) {
+                chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        sendChatMessage();
+                    }
+                });
+            }
+
+            if (chatSendBtn) {
+                chatSendBtn.addEventListener('click', () => {
+                    sendChatMessage();
+                });
+            }
+
+            if (chatSuggestions) {
+                chatSuggestions.addEventListener('click', (e) => {
+                    const chip = e.target.closest('.chat-chip');
+                    if (chip) {
+                        const question = chip.getAttribute('data-q');
+                        if (question) {
+                            sendChatMessage(question);
+                        }
+                    }
+                });
+            }
+
+            // 2. Open floating Candidate Detailed Panel (Image 2 style)
+            function openAnalysisPanel(filename) {
+                const candidate = cumulativeCandidates[filename];
+                if (!candidate) return;
+
+                // Dynamically compute active rank by sorting cumulativeCandidates by score descending
+                const sortedCandidates = Object.values(cumulativeCandidates).sort((a, b) => b.score - a.score);
+                const candidateIndex = sortedCandidates.findIndex(c => c.name === filename);
+                if (candidateIndex === -1) return;
+                const rank = candidateIndex + 1;
+
+                panelName.textContent = filename;
+                panelRankBadge.textContent = `Rank ${rank}`;
+                
+                if (rank === 1) {
+                    panelSubtitle.textContent = "Top Fit Candidate";
+                } else if (rank <= 3) {
+                    panelSubtitle.textContent = "High Match Candidate";
+                } else {
+                    panelSubtitle.textContent = "Review Match Candidate";
+                }
+
+                panelSimilarityScore.textContent = `${candidate.score}%`;
+                panelSimilarityBar.style.width = `${candidate.score}%`;
+
+                // Load skill lists
+                panelMatchedList.innerHTML = '';
+                panelMissingList.innerHTML = '';
+
+                const matched = candidate.found || [];
+                if (matched.length > 0) {
+                    matched.forEach(skill => {
+                        const badge = document.createElement('span');
+                        badge.className = 'matched-glow bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-3 py-1 rounded-full animate-fade-in';
+                        badge.textContent = skill;
+                        panelMatchedList.appendChild(badge);
+                    });
+                } else {
+                    panelMatchedList.innerHTML = '<span class="text-xs text-appMuted">No matching skills found.</span>';
+                }
+
+                const missing = candidate.missing || [];
+                if (missing.length > 0) {
+                    missing.forEach(skill => {
+                        const badge = document.createElement('span');
+                        badge.className = 'missing-glow bg-red-500/10 text-red-400 text-[10px] font-bold px-3 py-1 rounded-full animate-fade-in';
+                        badge.textContent = skill;
+                        panelMissingList.appendChild(badge);
+                    });
+                } else {
+                    panelMissingList.innerHTML = '<span class="text-xs text-emerald-400 font-bold">100% skills matched!</span>';
+                }
+
+                // Reset tab to Skill Match
+                if (tabBtnSkill) {
+                    tabBtnSkill.click();
+                }
+
+                // Reset chat history for this candidate
+                resetChatHistory(filename);
+
+                // Load PDF in iframe
+                if (pdfViewerFrame) {
+                    if (pdfLoader) pdfLoader.classList.remove('hidden');
+                    pdfViewerFrame.src = `/view-pdf/${encodeURIComponent(filename)}`;
+                }
+
+                analysisPanel.classList.remove('hidden');
+            }
+
+            // Render Skill Analysis Section
+            function renderSkillAnalysis(filteredRankings, skills) {
+                const sectionEl = document.getElementById('skillAnalysisSection');
+                if (!filteredRankings || filteredRankings.length === 0) {
+                    if (sectionEl) sectionEl.classList.add('hidden');
+                    return;
+                }
+                if (sectionEl) sectionEl.classList.remove('hidden');
+
+                const skillsMap = skills || {};
+                // Get top 5 candidates
+                const top5Candidates = filteredRankings.slice(0, 5);
+
+                // Gather all required skills dynamically
+                const skillSet = new Set();
+                top5Candidates.forEach(c => {
+                    const breakdown = skillsMap[c.name];
+                    if (breakdown) {
+                        if (breakdown.found) breakdown.found.forEach(s => skillSet.add(s));
+                        if (breakdown.missing) breakdown.missing.forEach(s => skillSet.add(s));
+                    }
+                });
+                const requiredSkills = Array.from(skillSet).sort();
+
+                // 1. Render Matrix Table
+                const matrixHeaderRow = document.getElementById('matrixHeaderRow');
+                const matrixTableBody = document.getElementById('matrixTableBody');
+
+                // Reset header row (keep only the first column header)
+                matrixHeaderRow.innerHTML = '<th class="pb-3 font-semibold text-xs text-appMuted">Required Skill</th>';
+                top5Candidates.forEach(c => {
+                    const name = c.name;
+                    const truncatedName = name.length > 12 ? name.substring(0, 12) + '...' : name;
+                    const th = document.createElement('th');
+                    th.className = 'pb-3 font-semibold text-[10px] text-center text-white';
+                    th.innerHTML = `<span class="cursor-help" title="${name}">${truncatedName}</span>`;
+                    matrixHeaderRow.appendChild(th);
+                });
+
+                // Render matrix table rows
+                matrixTableBody.innerHTML = '';
+                if (requiredSkills.length === 0) {
+                    const tr = document.createElement('tr');
+                    const td = document.createElement('td');
+                    td.setAttribute('colspan', top5Candidates.length + 1);
+                    td.className = 'py-4 text-center text-xs text-appMuted';
+                    td.textContent = 'No required skills detected.';
+                    tr.appendChild(td);
+                    matrixTableBody.appendChild(tr);
+                } else {
+                    requiredSkills.forEach(skill => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-b border-appBorder hover:bg-appCard/30 transition-all';
+                        
+                        // First cell is the skill name
+                        const tdSkill = document.createElement('td');
+                        tdSkill.className = 'py-3 font-medium text-white text-xs';
+                        tdSkill.textContent = skill;
+                        tr.appendChild(tdSkill);
+
+                        // Candidate columns
+                        top5Candidates.forEach(c => {
+                            const tdMatch = document.createElement('td');
+                            tdMatch.className = 'py-3 text-center';
+                            
+                            const breakdown = skills[c.name];
+                            const hasSkill = breakdown && breakdown.found && breakdown.found.includes(skill);
+
+                            if (hasSkill) {
+                                tdMatch.innerHTML = '<i class="fa-solid fa-check text-emerald-400 text-sm" title="Skill Found"></i>';
+                            } else {
+                                tdMatch.innerHTML = '<i class="fa-solid fa-xmark text-red-400 text-sm" title="Skill Missing"></i>';
+                            }
+                            tr.appendChild(tdMatch);
+                        });
+                        matrixTableBody.appendChild(tr);
+                    });
+                }
+
+                // 2. Render Accordion
+                const accordionContainer = document.getElementById('accordionContainer');
+                accordionContainer.innerHTML = '';
+
+                top5Candidates.forEach((c, index) => {
+                    const name = c.name;
+                    const breakdown = skills[name] || { found: [], missing: [], skill_score: 0.0 };
+                    const foundCount = breakdown.found ? breakdown.found.length : 0;
+                    const totalSkillsCount = foundCount + (breakdown.missing ? breakdown.missing.length : 0);
+                    
+                    const accordionItem = document.createElement('div');
+                    accordionItem.className = 'border border-appBorder rounded-xl overflow-hidden transition-all';
+                    
+                    // Card header button
+                    const headerBtn = document.createElement('button');
+                    headerBtn.type = 'button';
+                    headerBtn.className = 'w-full flex items-center justify-between p-4 bg-appBg hover:bg-appCard/50 transition-all text-left';
+                    headerBtn.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold text-[#F78166]">#${index + 1}</span>
+                            <div class="flex flex-col">
+                                <span class="font-bold text-xs text-white truncate max-w-[150px]" title="${name}">${name}</span>
+                                <span class="text-[10px] text-appMuted font-medium">${foundCount} of ${totalSkillsCount} skills found (${breakdown.skill_score}%)</span>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-appMuted text-xs transition-transform duration-200 chevron-icon"></i>
+                    `;
+                    
+                    // Detail panel
+                    const detailPanel = document.createElement('div');
+                    detailPanel.className = 'max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-appCard/30';
+                    detailPanel.innerHTML = `
+                        <div class="p-4 border-t border-appBorder grid grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-2">
+                                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                                    <i class="fa-solid fa-circle-check text-[8px]"></i> Skills Found
+                                </span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${breakdown.found && breakdown.found.length > 0 
+                                        ? breakdown.found.map(skill => `<span class="matched-glow bg-emerald-500/10 text-emerald-400 text-[9px] font-bold px-2 py-0.5 rounded-full">${skill}</span>`).join('')
+                                        : '<span class="text-xs text-appMuted">None</span>'
+                                    }
+                                </div>
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <span class="text-[10px] font-bold text-red-400 uppercase tracking-wider flex items-center gap-1">
+                                    <i class="fa-solid fa-circle-xmark text-[8px]"></i> Skills Missing
+                                </span>
+                                <div class="flex flex-wrap gap-1.5">
+                                    ${breakdown.missing && breakdown.missing.length > 0 
+                                        ? breakdown.missing.map(skill => `<span class="missing-glow bg-red-500/10 text-red-400 text-[9px] font-bold px-2 py-0.5 rounded-full">${skill}</span>`).join('')
+                                        : '<span class="text-xs text-emerald-400 font-semibold">All matched!</span>'
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // Click event to toggle accordion
+                    headerBtn.addEventListener('click', () => {
+                        const isExpanded = detailPanel.style.maxHeight && detailPanel.style.maxHeight !== '0px';
+                        
+                        // Close all panels in this accordion
+                        document.querySelectorAll('#accordionContainer > div').forEach(item => {
+                            const panel = item.querySelector('div');
+                            const chev = item.querySelector('.chevron-icon');
+                            if (panel) panel.style.maxHeight = '0px';
+                            if (chev) chev.classList.remove('rotate-180');
+                        });
+
+                        // Toggle this one
+                        if (!isExpanded) {
+                            detailPanel.style.maxHeight = detailPanel.scrollHeight + 'px';
+                            headerBtn.querySelector('.chevron-icon').classList.add('rotate-180');
+                        }
+                    });
+
+                    accordionItem.appendChild(headerBtn);
+                    accordionItem.appendChild(detailPanel);
+                    accordionContainer.appendChild(accordionItem);
+                });
+
+                // Auto-expand first accordion item
+                if (top5Candidates.length > 0) {
+                    setTimeout(() => {
+                        const firstItem = accordionContainer.firstElementChild;
+                        if (firstItem) {
+                            const btn = firstItem.querySelector('button');
+                            if (btn) btn.click();
+                        }
+                    }, 50);
+                }
+            }
+
+            // CSV Export Handler
+            function setupCsvExport(filteredRankings, skills) {
+                const exportBtn = document.getElementById('exportCsvBtn');
+                if (!exportBtn) return;
+
+                // Remove old event listeners
+                const newExportBtn = exportBtn.cloneNode(true);
+                exportBtn.parentNode.replaceChild(newExportBtn, exportBtn);
+
+                newExportBtn.addEventListener('click', () => {
+                    if (!filteredRankings || filteredRankings.length === 0) {
+                        alert('No candidate results available to export.');
+                        return;
+                    }
+
+                    const headers = ['Rank', 'Name', 'Score%', 'Skills Found', 'Skills Missing'];
+                    const rows = filteredRankings.map((c, index) => {
+                        const breakdown = skills[c.name] || { found: [], missing: [] };
+                        const skillsFound = breakdown.found ? breakdown.found.join(', ') : '';
+                        const skillsMissing = breakdown.missing ? breakdown.missing.join(', ') : '';
+                        return [
+                            index + 1,
+                            c.name,
+                            `${c.score}%`,
+                            skillsFound,
+                            skillsMissing
+                        ];
+                    });
+
+                    const csvContent = [
+                        headers.join(','),
+                        ...rows.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))
+                    ].join('\n');
+
+                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", "resume_screening_results.csv");
+                    link.style.visibility = 'hidden';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            }
+
+            // 3. Render Candidates Directory Database
+            const directoryTableBody = document.getElementById('directoryTableBody');
+            const emptyDirState = document.getElementById('emptyDirState');
+            const dirTableContainer = document.getElementById('dirTableContainer');
+            const searchInput = document.getElementById('candidateSearchInput');
+
+            function renderDirectory(searchQuery = '') {
+                const candidatesArray = Object.values(cumulativeCandidates);
+                const filtered = candidatesArray.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+                if (filtered.length === 0) {
+                    emptyDirState.classList.remove('hidden');
+                    dirTableContainer.classList.add('hidden');
+                    return;
+                }
+
+                emptyDirState.classList.add('hidden');
+                directoryTableBody.innerHTML = '';
+
+                filtered.forEach(c => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'border-b border-appBorder hover:bg-appCard/30 transition-all';
+                    tr.innerHTML = `
+                        <td class="py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="h-8 w-8 rounded-full bg-appBg border border-appBorder flex items-center justify-center text-xs font-semibold text-appMuted shrink-0">
+                                    ${c.name.substring(0, 2).toUpperCase()}
+                                </div>
+                                <span class="font-bold text-white truncate max-w-[200px]">${c.name}</span>
+                            </div>
+                        </td>
+                        <td class="py-4">
+                            <span class="font-bold text-purple-400 text-xs">${c.score}%</span>
+                            <span class="text-[10px] text-appMuted"> similarity</span>
+                        </td>
+                        <td class="py-4">
+                            <div class="flex flex-wrap gap-1 max-w-sm">
+                                ${c.found.map(skill => `<span class="bg-[#1F242C] text-appMuted text-[9px] px-2 py-0.5 rounded border border-appBorder">${skill}</span>`).slice(0, 5).join('')}
+                                ${c.found.length > 5 ? `<span class="text-[9px] text-appMuted font-bold">+${c.found.length - 5} more</span>` : ''}
+                                ${c.found.length === 0 ? '<span class="text-[10px] text-appMuted">None detected</span>' : ''}
+                            </div>
+                        </td>
+                        <td class="py-4">
+                            <button class="text-xs text-red-500 hover:text-red-400 delete-dir-btn" data-name="${c.name}">
+                                <i class="fa-solid fa-trash-can"></i> Remove
+                            </button>
+                        </td>
+                    `;
+                    directoryTableBody.appendChild(tr);
+                });
+
+                // Attach Delete event handlers
+                document.querySelectorAll('.delete-dir-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const name = e.currentTarget.getAttribute('data-name');
+                        delete cumulativeCandidates[name];
+                        localStorage.setItem(CUMULATIVE_CANDIDATES_KEY, JSON.stringify(cumulativeCandidates));
+                        renderDashboard();
+                        renderDirectory(searchInput.value);
+                        renderAnalytics();
+                    });
+                });
+
+                dirTableContainer.classList.remove('hidden');
+            }
+
+            // Real-time search in Directory
+            searchInput.addEventListener('input', (e) => {
+                renderDirectory(e.target.value.trim());
+            });
+
+            // 4. Render Analytics and Skill Deficit Charts
+            const analyticsAvgMatch = document.getElementById('analyticsAvgMatch');
+            const analyticsAvgSkillScore = document.getElementById('analyticsAvgSkillScore');
+            const highFitCount = document.getElementById('highFitCount');
+            const medFitCount = document.getElementById('medFitCount');
+            const lowFitCount = document.getElementById('lowFitCount');
+            
+            const analyticsEmptyState = document.getElementById('analyticsEmptyState');
+            const gapChartContainer = document.getElementById('gapChartContainer');
+
+            function renderAnalytics() {
+                const candidates = Object.values(cumulativeCandidates);
+                if (candidates.length === 0) {
+                    analyticsAvgMatch.textContent = "0%";
+                    analyticsAvgSkillScore.textContent = "0%";
+                    highFitCount.textContent = "0";
+                    medFitCount.textContent = "0";
+                    lowFitCount.textContent = "0";
+                    analyticsEmptyState.classList.remove('hidden');
+                    gapChartContainer.classList.add('hidden');
+                    return;
+                }
+
+                // Average Similarity computation
+                const sumSimilarity = candidates.reduce((sum, c) => sum + c.score, 0);
+                const avgSimilarity = round(sumSimilarity / candidates.length, 1);
+                analyticsAvgMatch.textContent = `${avgSimilarity}%`;
+
+                // Average Skill Rating computation
+                const sumSkill = candidates.reduce((sum, c) => sum + c.skill_score, 0);
+                const avgSkill = round(sumSkill / candidates.length, 1);
+                analyticsAvgSkillScore.textContent = `${avgSkill}%`;
+
+                // Distribution calculation
+                const high = candidates.filter(c => c.score >= 75).length;
+                const med = candidates.filter(c => c.score >= 50 && c.score < 75).length;
+                const low = candidates.filter(c => c.score < 50).length;
+                
+                highFitCount.textContent = high;
+                medFitCount.textContent = med;
+                lowFitCount.textContent = low;
+
+                // Gap analysis (Calculate frequency of missing skills across all JDs and resumes)
+                const missingFrequencies = {};
+                candidates.forEach(c => {
+                    c.missing.forEach(skill => {
+                        missingFrequencies[skill] = (missingFrequencies[skill] || 0) + 1;
+                    });
+                });
+
+                const gapList = Object.entries(missingFrequencies).map(([skill, count]) => {
+                    const percentage = Math.round((count / candidates.length) * 100);
+                    return { skill, percentage };
+                });
+
+                // Sort by highest deficit percentage descending
+                gapList.sort((a, b) => b.percentage - a.percentage);
+
+                if (gapList.length === 0) {
+                    analyticsEmptyState.classList.remove('hidden');
+                    gapChartContainer.classList.add('hidden');
+                } else {
+                    analyticsEmptyState.classList.add('hidden');
+                    gapChartContainer.innerHTML = '';
+
+                    gapList.forEach(item => {
+                        const bar = document.createElement('div');
+                        bar.className = 'flex flex-col gap-1.5 animate-fade-in';
+                        bar.innerHTML = `
+                            <div class="flex justify-between text-xs">
+                                <span class="font-bold text-white">${item.skill}</span>
+                                <span class="font-semibold text-red-400">${item.percentage}% of candidates missing</span>
+                            </div>
+                            <div class="w-full bg-[#0D1117] h-2 rounded-full overflow-hidden border border-appBorder">
+                                <div class="h-full bg-red-500 rounded-full" style="width: ${item.percentage}%"></div>
+                            </div>
+                        `;
+                        gapChartContainer.appendChild(bar);
+                    });
+
+                    gapChartContainer.classList.remove('hidden');
+                }
+            }
+
+            // 5. Jobs Template launcher
+            const screenTemplateBtns = document.querySelectorAll('.screen-template-btn');
+            screenTemplateBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const skillsText = e.currentTarget.getAttribute('data-skills');
+                    const jobTitle = e.currentTarget.getAttribute('data-title');
+                    
+                    // Pre-fill Job Description textarea in modal
+                    jdTextarea.value = `Job Profile Requirements: ${jobTitle}\n\nCandidate stack must include:\n${skillsText}\n\nResponsibilities:\n- Design and implement scalable software architectures.\n- Troubleshoot issues and optimize cloud structures.\n- Work in dynamic development teams using Git version control.`;
+                    
+                    // Trigger modal open
+                    screeningModal.classList.remove('hidden');
+                });
+            });
+
+            // 6. Settings dynamic threshold slider
+            thresholdSlider.addEventListener('input', (e) => {
+                similarityFilterThreshold = parseInt(e.target.value);
+                thresholdValue.textContent = `${similarityFilterThreshold}%`;
+                
+                // Re-render dashboard dynamic results to filter rows in real-time!
+                renderDashboard();
+            });
+            // Settings select models
+            selectModelBtns.forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const modelName = e.currentTarget.getAttribute('data-model');
+                    
+                    selectModelBtns.forEach(b => {
+                        b.className = "bg-appBg border border-appBorder hover:border-purple-500/40 px-4 py-2.5 rounded-xl text-xs font-bold text-appMuted flex items-center gap-2 transition-all";
+                        b.querySelector('i').className = "fa-solid fa-circle text-[8px]";
+                    });
+                    
+                    e.currentTarget.className = "bg-purple-600/10 border border-purple-500/40 px-4 py-2.5 rounded-xl text-xs font-bold text-purple-400 flex items-center gap-2 transition-all";
+                    e.currentTarget.querySelector('i').className = "fa-solid fa-circle-dot";
+
+                    if (modelName === 'sbert') {
+                        alert("Note: SBERT is configured inside 'ranker_advanced.py'. Switching default server route to SBERT requires modifying app.py route endpoints.");
+                    }
+                });
+            });
+
+            // Settings reset workspace data
+            const resetWorkspaceBtn = document.getElementById('resetWorkspaceBtn');
+            if (resetWorkspaceBtn) {
+                resetWorkspaceBtn.addEventListener('click', async () => {
+                    if (confirm("Are you sure you want to reset all candidate records and screening history for your workspace? This action cannot be undone.")) {
+                        try {
+                            await fetch('/reset-workspace', { method: 'POST' });
+                        } catch (err) {
+                            console.error("Failed to reset server workspace files:", err);
+                        }
+                        localStorage.removeItem(RESPONSE_DATA_KEY);
+                        localStorage.removeItem(CUMULATIVE_CANDIDATES_KEY);
+                        localStorage.removeItem(LAST_JD_KEY);
+                        alert("Workspace data has been cleared. Reloading page...");
+                        window.location.reload();
+                    }
+                });
+            }
+
+            // Save and load advanced options state
+            const optSemantic = document.getElementById('optSemantic');
+            const optParser = document.getElementById('optParser');
+            if (optSemantic) {
+                const savedOptSemantic = localStorage.getItem(`${CURRENT_USER}_optSemantic`);
+                if (savedOptSemantic !== null) {
+                    optSemantic.checked = savedOptSemantic === 'true';
+                }
+                optSemantic.addEventListener('change', () => {
+                    localStorage.setItem(`${CURRENT_USER}_optSemantic`, optSemantic.checked);
+                });
+            }
+            if (optParser) {
+                const savedOptParser = localStorage.getItem(`${CURRENT_USER}_optParser`);
+                if (savedOptParser !== null) {
+                    optParser.checked = savedOptParser === 'true';
+                }
+                optParser.addEventListener('change', () => {
+                    localStorage.setItem(`${CURRENT_USER}_optParser`, optParser.checked);
+                });
+            }
+            // Utility round helper
+            function round(value, decimals) {
+                return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+            }
+
+            // Restore dashboard, directory and analytics on page load if saved data exists
+            try {
+                if (Object.keys(cumulativeCandidates).length > 0) {
+                    renderDashboard();
+                }
+            } catch (e) {
+                console.error("Error restoring dashboard:", e);
+            }
+
+            try {
+                if (Object.keys(cumulativeCandidates).length > 0) {
+                    renderDirectory();
+                    renderAnalytics();
+                }
+            } catch (e) {
+                console.error("Error restoring directory/analytics:", e);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+# Python caching
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment secrets and credentials (CRITICAL)
+.env
+.env.local
+.env.*
+
+# Local databases
+*.db
+*.sqlite3
+
+# User uploaded resumes/data
+uploads/*
+!uploads/.gitkeep
+
+# Sentence Transformer deep learning weights caching
+models/*
+!models/.gitkeep
+
+# IDE configs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS-specific files
+.DS_Store
+Thumbs.db
